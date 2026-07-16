@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>饰品记账</title>
+<link rel="manifest" href="/static/manifest.json">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+<meta name="theme-color" content="#8B5E3C">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div id="app">
+  <nav class="tab-bar">
+    <button class="tab-btn active" data-tab="sell">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      识图卖货
+    </button>
+    <button class="tab-btn" data-tab="items">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      商品管理
+    </button>
+    <button class="tab-btn" data-tab="report">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      销售报表
+    </button>
+  </nav>
+
+  <div class="tab-content active" id="tab-sell">
+    <div class="sell-layout">
+      <div class="sell-camera">
+        <div class="camera-box" id="cameraBox">
+          <video id="video" autoplay playsinline style="display:none"></video>
+          <canvas id="canvas" style="display:none"></canvas>
+          <img id="capturedPreview" style="display:none">
+          <div class="camera-placeholder" id="cameraPlaceholder">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <p>拍照或上传图片</p>
+          </div>
+        </div>
+        <div class="camera-actions">
+          <button class="btn btn-primary" id="btnCamera">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            拍照
+          </button>
+          <button class="btn btn-secondary" id="btnUpload">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            上传
+          </button>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none">
+        <button class="btn btn-accent" id="btnMatch" style="display:none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          识别价格
+        </button>
+      </div>
+      <div class="sell-results" id="sellResults">
+        <div class="results-placeholder">
+          <p>拍照或上传饰品图片，系统自动匹配</p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-overlay" id="saleModal" style="display:none">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>确认出售</h3>
+          <button class="modal-close" id="closeSaleModalBtn">&times;</button>
+        </div>
+        <div class="modal-body" id="saleModalBody"></div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="btnCancelSale">取消</button>
+          <button class="btn btn-primary" id="btnConfirmSale">确认卖出</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-items">
+    <div class="items-toolbar">
+      <input type="text" id="itemSearch" class="search-input" placeholder="搜索商品名称…">
+      <div class="category-filter" id="categoryFilter"></div>
+      <button class="btn btn-primary" id="btnAddItem">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        添加
+      </button>
+    </div>
+    <div class="items-grid" id="itemsGrid"></div>
+  </div>
+
+  <div class="tab-content" id="tab-report">
+    <div class="report-header">
+      <div class="summary-cards" id="summaryCards"></div>
+    </div>
+    <div class="report-toolbar">
+      <input type="date" id="reportStart" class="date-input">
+      <span>至</span>
+      <input type="date" id="reportEnd" class="date-input">
+      <button class="btn btn-secondary" id="btnQueryReport">查询</button>
+    </div>
+    <div class="report-list" id="reportList"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="itemFormModal" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="itemFormTitle">添加商品</h3>
+      <button class="modal-close" id="closeItemFormBtn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="itemForm">
+        <input type="hidden" id="formItemId">
+        <label>商品名称</label>
+        <input type="text" id="formName" required>
+        <label>价格 (元)</label>
+        <input type="number" id="formPrice" step="0.01" min="0" required>
+        <label>分类</label>
+        <select id="formCategory"></select>
+        <label>库存数量</label>
+        <input type="number" id="formStock" value="1" min="0">
+        <label>备注</label>
+        <input type="text" id="formNote" placeholder="可选">
+        <label>商品图片</label>
+        <div class="form-image-upload">
+          <input type="file" id="formImage" accept="image/*">
+          <img id="formImagePreview" style="display:none;max-width:100%;max-height:180px;margin-top:8px;border-radius:8px">
+          <button type="button" class="btn-small" id="formRemoveImage" style="display:none">移除</button>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="btnCancelItemForm">取消</button>
+      <button class="btn btn-primary" id="btnSaveItem">保存</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>
