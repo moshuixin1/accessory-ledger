@@ -1,0 +1,13 @@
+catalog/
+sales/
+data/
+__pycache__/
+*.pyc
+.env
+.DS_Store
+*.egg-info/
+dist/
+build/
+*.db-journal
+*.db-wal
+*.db-shm
